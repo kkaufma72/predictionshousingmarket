@@ -80,14 +80,6 @@ if not zillow_data.empty:
         st.write(f"**Mean Squared Error:** {mse:.2f}")
         st.write(f"**R-Squared:** {r2:.2f}")
 
-        importance = pd.DataFrame({
-            "Feature": feature_cols,
-            "Importance": model.feature_importances_
-        }).sort_values(by="Importance", ascending=False)
-
-        st.subheader("Feature Importance")
-        st.bar_chart(importance.set_index("Feature"))
-
         # Select region (metro)
         st.subheader("Select Region (Metro)")
         selected_metro = st.selectbox("Choose a region (metro):", zillow_data["Metro"].unique(), index=0)
