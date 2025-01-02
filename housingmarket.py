@@ -1,25 +1,17 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, r2_score
-import logging
-
-# Set up logging
-logging.basicConfig(level=logging.DEBUG)
 
 @st.cache_data(show_spinner=False)
 def load_zillow_data():
     url = "https://files.zillowstatic.com/research/public_csvs/zhvi/Metro_zhvi_uc_sfrcondo_tier_0.33_0.67_sm_sa_month.csv?t=1735843180"
     try:
         st.write("Loading Zillow data from URL:", url)
-        logging.debug(f"Loading data from {url}")
         data = pd.read_csv(url, usecols=lambda col: col != "RegionID")
         st.write("Data loaded successfully. Processing data...")
-        logging.debug("Data loaded successfully. Processing data...")
         data = data.rename(columns={"RegionName": "Metro"})
 
         # Melt the DataFrame so each row has Date & Price
@@ -38,11 +30,9 @@ def load_zillow_data():
 
         # Ensure Metro is a string column
         data = data.astype({"Metro": "string"})
-        logging.debug("Data processing complete.")
         return data
     except Exception as e:
         st.error(f"Error loading Zillow data: {e}")
-        logging.error(f"Error loading Zillow data: {e}")
         return pd.DataFrame()
 
 # Load Zillow data only
@@ -156,8 +146,6 @@ if not zillow_data.empty:
 
     except Exception as e:
         st.error(f"An error occurred: {e}")
-        logging.error(f"An error occurred: {e}")
 
 else:
     st.error("Unable to load Zillow data. Please try again later.")
-    logging.error("Unable to load Zillow data.")
