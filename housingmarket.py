@@ -28,7 +28,7 @@ def load_zillow_data():
         )
 
         # Convert Date and Price to appropriate types
-        data["Date"] = pd.to_datetime(data["Date"], errors="coerce")
+        data["Date"] = pd.to_datetime(data["Date"], format="%Y-%m-%d", errors="coerce")
         data["Price"] = pd.to_numeric(data["Price"], errors="coerce")
         data = data.dropna(subset=["Date", "Price"])
 
