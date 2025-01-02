@@ -61,8 +61,13 @@ if not zillow_data.empty:
         features = zillow_data[feature_cols].copy()
         target = zillow_data["Price"]
 
+        # Use a smaller sample for training to speed up processing
+        sample_size = min(10000, len(features))
+        features_sample = features.sample(n=sample_size, random_state=42)
+        target_sample = target.loc[features_sample.index]
+
         X_train, X_test, y_train, y_test = train_test_split(
-            features, target, test_size=0.2, random_state=42
+            features_sample, target_sample, test_size=0.2, random_state=42
         )
         model = RandomForestRegressor(n_jobs=-1, random_state=42)
         model.fit(X_train, y_train)
