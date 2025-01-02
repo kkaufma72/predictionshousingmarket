@@ -39,6 +39,7 @@ def load_zillow_data():
 
         # Ensure Metro is a string column
         data = data.astype({"Metro": "string"})
+        logging.debug("Data processing complete.")
         return data
     except Exception as e:
         st.error(f"Error loading Zillow data: {e}")
@@ -154,6 +155,45 @@ if not zillow_data.empty:
             st.write(f"Price Trend for {metro}")
             st.line_chart(metro_data.set_index("Date")["Price"])
 
+        st.subheader("Correlation Heatmap (Year, Price, SqFt)")
+        corr_data = zillow_data_small[["Year", "Price", "SqFt"]].corr()
+        fig, ax = plt.subplots()
+        sns.heatmap(corr_data, annot=True, cmap="coolwarm", ax=ax)
+        ax.set_title("Correlation Among Features")
+        st.pyplot(fig)
+
+        st.subheader("Interactive Map of Prices")
+        map_data = zillow_data.groupby("Metro").agg({"Price": "mean", "SqFt": "mean"}).reset_index()
+        map_data["lat"] = np.random.uniform(25, 50, size=len(map_data))
+        map_data["lon"] = np.random.uniform(-125, -65, size(len(map_data)))
+        st.pydeck_chart(pdk.Deck(
+            map_style='mapbox://styles/mapbox/light-v9',
+            initial_view_state=pdk.ViewState(
+                latitude=37.7749,
+                longitude=-122.4194,
+                zoom=3,
+                pitch=50,
+            ),
+            layers=[
+                pdk.Layer(
+                    'HexagonLayer',
+                    data=map_data,
+                    get_position='[lon, lat]',
+                    radius=20000,
+                    elevation_scale=4,
+                    elevation_range=[0, 1000],
+                    pickable=True,
+                    extruded=True,
+                ),
+                pdk.Layer(
+                    'ScatterplotLayer',
+                    data=map_data,
+                    get_position='[lon, lat]',
+                    get_color='[200, 30, 0, 160]',
+                    get_radius='Price / 10000',  # Use Price to determine radius
+                ),
+            ],
+        ))
     except Exception as e:
         st.error(f"An error occurred: {e}")
         logging.error(f"An error occurred: {e}")
